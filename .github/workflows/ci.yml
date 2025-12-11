@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install deps
+        run: npm ci
+      - name: Run tests
+        run: npm test
+
+  build-docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Build Docker image
+        run: |
+          docker build -t vanilkovyblesk-eshop:latest .
+      - name: Run container for smoke tests
+        run: |
+          docker run -d --name vbl_test -p 3000:3000 vanilkovyblesk-eshop:latest
+      - name: Wait for service to be ready
+        run: |
+          # wait for container to respond on port 3000 (max ~60s)
+          for i in {1..30}; do
+            if curl -sS http://localhost:3000/health >/dev/null 2>&1; then
+              echo "service ready"; break
+            fi
+            echo "waiting for service... ($i)"; sleep 2
+          done
+      - name: Run smoke tests against container (with retries)
+        run: |
+          attempts=3
+          success=0
+          for i in $(seq 1 $attempts); do
+            echo "Smoke attempt $i"
+            if npm run smoke; then
+              echo "Smoke succeeded"
+              success=1
+              break
+            else
+              echo "Smoke failed on attempt $i"
+              sleep 2
+            fi
+          done
+          if [ "$success" -ne 1 ]; then
+            echo "All smoke attempts failed"
+            exit 1
+          fi
+      - name: Capture and trim container logs
+        run: |
+          # capture full logs, then trim to last 200KB for artifact
+          docker logs vbl_test > smoke-logs.txt || true
+          # ensure file exists
+          touch smoke-logs.txt
+          # trim to last ~200KB
+          tail -c 200000 smoke-logs.txt > smoke-logs-trimmed.txt || cp smoke-logs.txt smoke-logs-trimmed.txt
+      - name: Upload smoke logs (trimmed)
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-logs
+          path: smoke-logs-trimmed.txt
+      - name: Capture docker inspect on failure
+        if: failure()
+        run: |
+          docker inspect vbl_test > smoke-inspect.json || true
+      - name: Upload inspect (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-inspect
+          path: smoke-inspect.json
+      - name: Stop and remove test container
+        run: |
+          docker stop vbl_test || true
+          docker rm vbl_test || true
+      - name: Login to Docker Hub (optional)
+        if: secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Push to Docker Hub (optional)
+        if: secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN
+        run: |
+          docker tag vanilkovyblesk-eshop:latest ${{ secrets.DOCKERHUB_USERNAME }}/vanilkovyblesk-eshop:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/vanilkovyblesk-eshop:latest

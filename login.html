@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>vanilkovýblesk.cz</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <h1><a href="/">vanilkovýblesk.cz</a></h1>
+        <nav>
+          <a href="/">Obchod</a>
+          <a href="/cart">Košík (0)</a>
+          
+            <a href="/admin/login">Admin</a>
+          
+        </nav>
+      </div>
+    </header>
+    <main class="wrap">
+      <h2>Admin přihlášení</h2>
+
+<form method="post" action="/admin/login">
+  <input type="hidden" name="_csrf" value="kxc2V0Bh-RVt5jS-NNWOrNNsRsqYyKDrAj00" />
+  <label>Heslo<br/><input name="password" type="password" required /></label><br/>
+  <button type="submit">Přihlásit</button>
+</form>
+
+    </main>
+    <footer class="wrap">© vanilkovýblesk.cz — demo</footer>
+  </body>
+</html>

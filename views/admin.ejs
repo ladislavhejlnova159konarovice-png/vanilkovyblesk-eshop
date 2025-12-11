@@ -1,0 +1,11 @@
+<h2>Admin - přidat produkt (demo)</h2>
+<form method="post" action="/admin/add">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <label>Název<br/><input name="title" required /></label><br/>
+  <label>Popis<br/><textarea name="description"></textarea></label><br/>
+  <label>Cena (Kč)<br/><input name="price" required type="number" step="0.01" /></label><br/>
+  <label>URL obrázku<br/><input name="image" placeholder="/images/placeholder.svg" /></label><br/>
+  <button type="submit">Přidat</button>
+</form>
+
+<p><a href="/admin/orders">Zobrazit objednávky</a> | <a href="/admin/logout">Odhlásit</a></p>

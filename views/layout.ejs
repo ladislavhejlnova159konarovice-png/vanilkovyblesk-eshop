@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>vanilkovýblesk.cz</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <h1><a href="/">vanilkovýblesk.cz</a></h1>
+        <nav>
+          <a href="/">Obchod</a>
+          <a href="/cart">Košík (<%= Object.keys(cart || {}).reduce((s, k) => s + (cart[k]||0), 0) %>)</a>
+          <% if (isAdmin) { %>
+            <a href="/admin">Admin</a>
+            <a href="/admin/logout">Odhlásit</a>
+          <% } else { %>
+            <a href="/admin/login">Admin</a>
+          <% } %>
+        </nav>
+      </div>
+    </header>
+    <main class="wrap">
+      <%- body %>
+    </main>
+    <footer class="wrap">© vanilkovýblesk.cz — demo</footer>
+  </body>
+</html>

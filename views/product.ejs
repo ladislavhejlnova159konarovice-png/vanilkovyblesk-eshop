@@ -1,0 +1,14 @@
+<article class="product-detail">
+  <img src="<%= product.image || '/images/placeholder.svg' %>" alt="<%= product.title %>" />
+  <div class="meta">
+    <h2><%= product.title %></h2>
+    <p class="price"><%= product.price.toFixed(2) %> Kč</p>
+    <p><%= product.description %></p>
+    <form method="post" action="/cart/add">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <input type="hidden" name="productId" value="<%= product.id %>" />
+      <label>Kusů <input type="number" name="qty" value="1" min="1" style="width:60px"/></label>
+      <button>Přidat do košíku</button>
+    </form>
+  </div>
+</article>

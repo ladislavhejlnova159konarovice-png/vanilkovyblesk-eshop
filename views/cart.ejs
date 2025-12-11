@@ -1,0 +1,20 @@
+<h2>Košík</h2>
+<% if (items.length === 0) { %>
+  <p>Košík je prázdný. <a href="/">Pokračovat v nákupu</a></p>
+<% } else { %>
+  <table class="cart-table">
+    <thead><tr><th>Produkt</th><th>Kusů</th><th>Jedn. cena</th><th>Celkem</th></tr></thead>
+    <tbody>
+      <% items.forEach(it => { %>
+        <tr>
+          <td><a href="/product/<%= it.product.id %>"><%= it.product.title %></a></td>
+          <td><%= it.qty %></td>
+          <td><%= it.product.price.toFixed(2) %> Kč</td>
+          <td><%= it.subtotal.toFixed(2) %> Kč</td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <p class="total">Celkem: <strong><%= total.toFixed(2) %> Kč</strong></p>
+  <p><a class="btn" href="/checkout">Přejít k platbě</a></p>
+<% } %>

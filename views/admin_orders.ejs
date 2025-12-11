@@ -1,0 +1,21 @@
+<h2>Objednávky (admin)</h2>
+<% if (!orders || orders.length === 0) { %>
+  <p>Žádné objednávky.</p>
+<% } else { %>
+  <table class="cart-table">
+    <thead><tr><th>ID</th><th>Jméno</th><th>E-mail</th><th>Adresa</th><th>Počet položek</th><th>Celkem</th><th>Vytvořeno</th></tr></thead>
+    <tbody>
+      <% orders.forEach(o => { %>
+        <tr>
+          <td>#<%= o.id %></td>
+          <td><%= o.name %></td>
+          <td><%= o.email %></td>
+          <td><%= o.address %></td>
+          <td><%= (JSON.parse(o.items) || []).length %></td>
+          <td><%= Number(o.total).toFixed(2) %> Kč</td>
+          <td><%= o.created_at %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
